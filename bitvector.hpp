@@ -30,17 +30,18 @@ class bit_vector {
 
 public:
     /**
-     * \brief Default constructor
+     * \brief Parameterized constructor
      *
      * \note Runs in constant time.
      */
-    bit_vector();
-    // The synthesized copy constructor, assignment operator, and destructor
-    // should be sufficient, because std::list uses some sort of allocator,
-    // and is therefore responsible for its own memory.
+    bit_vector(std::string seq);
+    
+    uint64_t size();
 
 private:
-    std::unique_ptr<std::byte[]> bytes_;
+    uint64_t size_;
+
+    std::vector<uint8_t> bytes_;
 
     /**
      * \class rank_support
@@ -79,25 +80,25 @@ private:
      * \brief
      *      The size of the associated bit vector
      */
-    size_t size_;
+    uint64_t size_;
 
     /**
     * \brief
     *       An array to help compute rank
     */
-    std::unique_ptr<size_t[]> Rs_;
+    std::vector<uint8_t> Rs_;
 
     /**
     * \brief
     *       An array to help compute rank
     */
-    std::unique_ptr<size_t[]> Rb_;
+    std::vector<uint8_t> Rb_;
 
     /**
     * \brief
     *       An array to help compute rank
     */
-    std::unique_ptr<size_t[]> Rp_;
+    std::vector<uint8_t> Rp_;
 
 };
 

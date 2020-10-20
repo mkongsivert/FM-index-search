@@ -10,9 +10,38 @@
 
 #include <string>
 #include <sstream>
+#include <math.h>
+
+bit_vector::bit_vector(std::string seq)
+{
+    uint64_t counter = 0;
+    uint8_t curr = 0;
+    for (std::string::iterator itr=seq.begin(); itr!=seq.end(); ++itr)
+    {
+        curr = curr*2 + std::stoi(*itr);
+        if (counter%8==7)
+        {
+            bytes_.push_back(curr);
+            curr = 0;
+        }
+        ++counter;
+    }
+    size_ = counter;
+    if (counter%8 != 0)
+    {
+        uint64_t pad = 8 - (counter%8);
+        curr = curr* pow(2, pad);
+        bytes_.push_back(curr);
+    } 
+}
+
+uint64_t bit_vector::size()
+{
+    return size_;
+}
 
 rank_support::rank_support(bit_vector bits) :
-        size_{0}
+        size_{bits.size()}
 {
     
 }
