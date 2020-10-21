@@ -93,7 +93,18 @@ private:
         uint64_t index_;
         /// The byte that this iterator points to.
         BitvecIterator byteIt_;
-    }
+    };
+
+    // // these functions help us implement the relational operators (see below)
+    // template <typename Element, typename ChunklistIterator>
+    // friend bool operator==(
+    //         const ChunkyString::Iterator<Element, ChunklistIterator>& lhs,
+    //         const ChunkyString::Iterator<Element, ChunklistIterator>& rhs);
+    
+    // template <typename Element, typename ChunklistIterator>
+    // friend bool operator!=(
+    //         const ChunkyString::Iterator<Element, ChunklistIterator>& lhs,
+    //         const ChunkyString::Iterator<Element, ChunklistIterator>& rhs);
 };
 
 class rank_support {
@@ -156,5 +167,7 @@ inline std::ostream& operator<<(std::ostream& out, const ChunkyString& text)
 {
     return text.print(out);
 }*/
+
+#include "iterator-private.hpp"
 
 #endif // BITSTRING_HPP_INCLUDED

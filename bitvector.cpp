@@ -35,6 +35,26 @@ bit_vector::bit_vector(std::string seq)
     } 
 }
 
+bit_vector::iterator bit_vector::begin()
+{
+    return iterator(0, bytes_.begin());
+}
+
+bit_vector::const_iterator bit_vector::begin() const
+{
+    return const_iterator(0, bytes_.begin());
+}
+
+bit_vector::iterator bit_vector::end()
+{
+    return iterator(0, bytes_.end());
+}
+
+bit_vector::const_iterator bit_vector::end() const
+{
+    return const_iterator(0, bytes_.end());
+}
+
 uint64_t bit_vector::size()
 {
     return size_;
@@ -43,7 +63,11 @@ uint64_t bit_vector::size()
 rank_support::rank_support(bit_vector bits) :
         size_{bits.size()}
 {
-    
+    uint64_t s = ceil(pow(log2(size_), 2)/2);
+    uint64_t d = ceil(log2(size_)/2);
+
+    //TODO: re-implement with iterator
+    for (std::vector<uint8_t>::iterator itr = )
 }
 
 ChunkyString::iterator ChunkyString::begin()
