@@ -141,19 +141,30 @@ private:
     * \brief
     *       An array to help compute rank
     */
-    std::vector<uint8_t> Rs_;
+    std::vector<uint64_t> Rs_;
 
     /**
     * \brief
     *       An array to help compute rank
     */
-    std::vector<uint8_t> Rb_;
+    std::vector<uint64_t> Rb_;
 
     /**
     * \brief
-    *       An array to help compute rank
+    *       A matrix to help compute rank
     */
-    std::vector<uint8_t> Rp_;
+    std::vector<std::vector<uint64_t>> Rp_;
+
+    /**
+    * \brief A helper function to find rank of numbers
+    *
+    * \param n   The number to be represented in binary
+    *
+    * \param i   The index we are counting up to
+    *
+    * \param b   The number of bits used to represent the number
+    */
+    uint64_t rank_helper(uint64_t n, uint64_t i, uint64_t b);
 
 };
 
