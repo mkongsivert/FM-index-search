@@ -36,64 +36,17 @@ public:
      */
     bit_vector(std::string seq);
 
-
-    using iterator = Iterator<uint8_t, std::vector<uint8_t>::iterator>;
-    using const_iterator = Iterator<const uint8_t, std::vector<uint8_t>::iterator>;
-
     uint64_t size();
-    iterator begin();
-    iterator end();
-    const_iterator begin() const;
-    const_iterator end() const;
 
 private:
     uint64_t size_;
 
-    std::vector<uint8_t> bytes_;
+    uint8_t *bytes_;
 
     /**
      * \class rank_support
      * \brief Class / structure that “wraps” the underlying bit-vector.
      */
-    template <typename Element, typename BitvecIterator>
-    class Iterator {
-    public:
-        Iterator();
-        //Iterator(const Iterator<const uint8_t, std::vector<uint8_t>::iterator>& i);
-
-        // Make Iterator STL-friendly with these typedefs:        
-        using value_type = uint8_t;
-        using reference  = Element&;
-        using pointer    = Element*;
-
-        using difference_type   = ptrdiff_t;
-        using iterator_category = std::bidirectional_iterator_tag;
-        using const_reference   = const value_type&;
-
-        Iterator& operator++();
-        Iterator& operator--();
-        reference operator*() const;
-        bool operator==(const Iterator& rhs) const;
-        bool operator!=(const Iterator& rhs) const;
-
-    private:
-        friend class bit_vector;
-
-        /**
-         * \brief Private constructor,
-         *        called by bit_vector::begin() and bit_vector::end()
-         */
-        Iterator(size_type index, BitvecIterator byteIt);
-
-        /**
-         * \brief
-         *      The index within `*byteIt_` of the bit that this iterator
-         *      points to.
-         */
-        uint64_t index_;
-        /// The byte that this iterator points to.
-        BitvecIterator byteIt_;
-    };
 
     // // these functions help us implement the relational operators (see below)
     // template <typename Element, typename ChunklistIterator>

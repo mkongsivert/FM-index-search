@@ -14,59 +14,26 @@
 
 bit_vector::bit_vector(std::string seq)
 {
+    no_bytes = ceil(float(seq.length())/8.0);
+    bytes = new uint8_t[no_bytes]
     uint64_t counter = 0;
     uint8_t curr = 0;
-    for (std::string::iterator itr=seq.begin(); itr!=seq.end(); ++itr)
+    for (uint64_t i=0; i<=seq.length(); ++i)
     {
-        curr = curr*2 + std::stoi(*itr);
-        if (counter%8==7)
+        curr = curr*2 + std::stoi(str[i]);
+        if (i%8==7)
         {
-            bytes_.push_back(curr);
+            bytes_[(i-7)/8] = curr;
             curr = 0;
         }
-        ++counter;
     }
-    size_ = counter;
-    if (counter%8 != 0)
+    size_ = str.length();
+    if (size_%8 != 0)
     {
         uint64_t pad = 8 - (counter%8);
         curr = curr* pow(2, pad);
-        bytes_.push_back(curr);
+        bytes_.[-1] = curr;
     } 
-}
-
-bit_vector::iterator bit_vector::begin()
-{
-    return iterator(0, bytes_.begin());
-}
-
-bit_vector::const_iterator bit_vector::begin() const
-{
-    return const_iterator(0, bytes_.begin());
-}
-
-bit_vector::iterator bit_vector::end()
-{
-    if (size_%8==0)
-    {
-        return iterator(0, bytes.end());
-    }
-    else
-    {
-        return iterator(size_%8, --bytes_.end());
-    }
-}
-
-bit_vector::const_iterator bit_vector::end() const
-{
-    if (size_%8==0)
-    {
-        return iterator(0, bytes.end());
-    }
-    else
-    {
-        return iterator(size_%8, --bytes_.end());
-    }
 }
 
 uint64_t bit_vector::size()
