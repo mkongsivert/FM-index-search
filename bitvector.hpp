@@ -147,8 +147,9 @@ public:
     */
     uint64_t select0(uint64_t i);
     uint64_t overhead();
-    save(string& fname);
-    load(string& fname);
+    std::string print();
+    void save(string& fname);
+    void load(string& fname);
 private:
     rank_support r_supp_;
 }

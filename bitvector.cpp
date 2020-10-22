@@ -153,8 +153,8 @@ std::string rank_support::print()
 
 uint64_t rank_support::overhead()
 {
-    // TODO: write
-    return 0;
+    // TODO
+    return sizeof(this)*8; // sizeof returns size in bytes
 }
 
 void rank_support::save(string& fname)
@@ -173,6 +173,12 @@ void rank_support::load(string& fname)
 uint64_t rank_support::size()
 {
     return bits_.size();
+}
+
+select_support::select_support(rank_support r_supp) :
+    r_supp_{r_supp}
+{
+    // nothing to do here
 }
 
 uint64_t select_support::select1_help(uint64_t i, uint64_t n, uint64_t m)
@@ -235,12 +241,21 @@ uint64_t select_support::select0(uint64_t i)
 
 uint64_t select_support::overhead()
 {
-    // TODO: write
+    // TODO:
+    return sizeof(this)*8
+}
+
+std::string select_support::print()
+{
+    return r_supp_.print();
 }
 
 void select_support::save(string& fname)
 {
-    // TODO: write
+    ofstream myfile;
+    myfile.open (fname);
+    myfile << print();
+    myfile.close();
 }
 
 void select_support::load(string& fname)
