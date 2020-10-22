@@ -14,8 +14,8 @@
 
 bit_vector::bit_vector(std::string seq)
 {
-    no_bytes = ceil(float(seq.length())/8.0);
-    bytes = new uint8_t[no_bytes]
+    num_bytes_ = ceil(float(seq.length())/8.0);
+    bytes = new uint8_t[num_bytes_]
     uint64_t counter = 0;
     uint8_t curr = 0;
     for (uint64_t i=0; i<=seq.length(); ++i)
@@ -41,6 +41,11 @@ uint64_t bit_vector::size()
     return size_;
 }
 
+uint64_t bit_vector::num_bytes()
+{
+    return num_bytes_;
+}
+
 int64_t rank_support::rank_helper(uint64_t n, uint64_t i, uint64_t b)
 {
     uint64_t msb = (n >= pow(2,b-1) ? 1 : 0)
@@ -54,48 +59,58 @@ int64_t rank_support::rank_helper(uint64_t n, uint64_t i, uint64_t b)
     }
 }
 
-std::vector<std::vector<uint64_t>> rank_support::rank_matrix(uint64_t b)
-{
-    std::vector<std::vector<uint64_t>> mat;
-    for (uint64_t i = 0; i <= pow(2,b); ++i)
-    {
-        std::vector<uint64_t> row;
-        for (uint64_t j = 0; j <= b; ++j)
-        {
-            row.push_back(rank_helper(i,j,b));
-        }
-        mat.push_back(row);
-    }
-    return mat;
-}
-
 rank_support::rank_support(bit_vector bits) :
         size_{bits.size()}
 {
-    uint64_t s = ceil(pow(log2(size_), 2)/2);
-    uint64_t d = ceil(log2(size_)/2);
+    uint64_t s_ = ceil(pow(log2(size_), 2)/2);
+    uint64_t b_ = ceil(log2(size_)/2);
 
     loopCount = 0;
     sCount = 0;
-    dCount = 0;
+    bCount = 0;
     for (auto itr = bits.begin(); itr != bits.end(); ++itr)
     {
-        if (loopCount%d == 0)
+        if (loopCount%b_ == 0)
         {
-            Rd_.push_back(dCount);
+            Rb_.push_back(dCount);
         }
-        if (loopCount%s == 0)
+        if (loopCount%s_ == 0)
         {
             Rs_.push_back(sCount);
-            dCount = 0; // reset d entries for every s entry
+            dCount = 0; // reset b entries for every s entry
         }
         ++loopCount;
     }
+
+    // Build matrix separately
+    Rp_ = new uint64_t*[pow(2,b)];
+    for (uint64_t i = 0; i < pow(2,b); ++i)
+    {
+        Rp_[i] = new uint64_t[b];
+        for (uint64_t j = 0; j < b; ++j)
+        {
+            Rp_[i][j] = rank_helper(i,j,b);
+        }
+    }
+}
+
+uint64_t rank_support::get_bit_i(uint64_t i)
+{
+    byte = bytes_[floor(float(i)/8.0)];
+    pos = i%8;
+    return floor(float(byte)/float(pow(2,7-pos))) % 2;
 }
 
 uint64_t rank_support::rank1(uint64_t i)
 {
-    
+    i = 0 // bitstring type
+    for (k = i; k < i+b_; ++k)
+    {
+        i = 2*i + get_bit_i(k)
+    }
+    j = i%b_ // index within bitstring
+    // TODO: Maybe clean this up?
+    return Rs_[floor(float(i)/float(s_))] + Rb_[floor(float(i)/float(b_))] + Rp_[i][j];
 }
 
 uint64_t rank_support::rank0(uint64_t i)

@@ -37,11 +37,15 @@ public:
     bit_vector(std::string seq);
 
     uint64_t size();
+    uint64_t num_bytes();
 
 private:
     uint64_t size_;
+    uint64_t num_bytes_;
+    uint64_t s_;
+    uint64_t b_;
 
-    uint8_t *bytes_;
+    uint8_t* bytes_;
 
     /**
      * \class rank_support
@@ -94,19 +98,19 @@ private:
     * \brief
     *       An array to help compute rank
     */
-    std::vector<uint64_t> Rs_;
+    uint64_t* Rs_;
 
     /**
     * \brief
     *       An array to help compute rank
     */
-    std::vector<uint64_t> Rb_;
+    uint64_t* Rb_;
 
     /**
     * \brief
     *       A matrix to help compute rank
     */
-    std::vector<std::vector<uint64_t>> Rp_;
+    uint64_t** Rp_;
 
     /**
     * \brief A helper function to find rank of numbers
@@ -118,6 +122,8 @@ private:
     * \param b   The number of bits used to represent the number
     */
     uint64_t rank_helper(uint64_t n, uint64_t i, uint64_t b);
+
+    uint64_t** rank_matrix(uint64_t b);
 
 };
 
@@ -131,7 +137,5 @@ inline std::ostream& operator<<(std::ostream& out, const ChunkyString& text)
 {
     return text.print(out);
 }*/
-
-#include "iterator-private.hpp"
 
 #endif // BITSTRING_HPP_INCLUDED
