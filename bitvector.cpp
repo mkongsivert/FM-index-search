@@ -1,9 +1,9 @@
 /**
- * \file chunkystring.cpp
+ * \file bitvector.cpp
  *
- * \authors the fantastical falcon_kangaroo
+ * \authors Mackenzie Kong-Sivert
  *
- * \brief Implements the ChunkyString class.
+ * \brief Implements the bit_vector, rank_support, and select_support classes.
  */
 
 #include "bitvector.hpp"
@@ -28,6 +28,8 @@ bit_vector::bit_vector(std::string seq)
         }
     }
     size_ = str.length();
+
+    // Add padding if necessary
     if (size_%8 != 0)
     {
         uint64_t pad = 8 - (counter%8);
@@ -44,6 +46,27 @@ uint64_t bit_vector::size()
 uint64_t bit_vector::num_bytes()
 {
     return num_bytes_;
+}
+
+std::string bit_vector::dec_to_str(uint8_t n)
+{
+    if (n <= 1)
+    {
+        return std::to_string(n);
+    }
+    else
+    {
+        return dec_to_str(n/2) + std::to_string(n%2);
+    }
+}
+
+std::string bit_vector::print()
+{
+    std::string bitstr = '';
+    for (uint64_t i = 0; i < num_bytes_; ++i)
+    {
+        bitstr += dec_to_str(bytes_[i]);
+    }
 }
 
 int64_t rank_support::rank_helper(uint64_t n, uint64_t i, uint64_t b)
@@ -118,72 +141,127 @@ uint64_t rank_support::rank0(uint64_t i)
     return i - rank1(i);
 }
 
+std::string rank_support::print()
+{
+    std::string output = "Bitstring: " + bits_.print()
+    output += "\nSize: " + std::to_string(bits_.size()) + "\n\n";
+    output += "\nR_s: " + to_string(*Rs_) + "\nR_b: " + to_string(*R_b)
+    output += "s: " + to_string(s_) + "\nb: " + to_string(b_) + "\n\n";
+    output += "Overhead:" + to_string(overhead());
+    return output;
+}
+
 uint64_t rank_support::overhead()
 {
-    
+    // TODO: write
+    return 0;
 }
 
 void rank_support::save(string& fname)
 {
-    
+    ofstream myfile;
+    myfile.open (fname);
+    myfile << print();
+    myfile.close();
 }
 
 void rank_support::load(string& fname)
 {
-    
+    // TODO: write
 }
 
-// ChunkyString& ChunkyString::operator+=(const ChunkyString& rhs)
+uint64_t rank_support::size()
+{
+    return bits_.size();
+}
+
+uint64_t select_support::select1_help(uint64_t i, uint64_t n, uint64_t m)
+{
+    mid = (n+m)/2
+    midRank = r_supp_.rank1(mid)
+    
+    if (midRank == i)
+    {
+        return mid;
+    }
+    else if ((m-n) < 1)
+    {
+        cout << "ERROR: desired index not found"
+        return 0;
+    }
+    else if (midRank < i)
+    {
+        return select1_help(i, n, mid);
+    }
+    else
+    {
+        return select1_help(i, mid, m);
+    }
+}
+
+uint64_t select_support::select1(uint64_t i)
+{
+    return select1_help(i, 0, r_supp_.size());
+}
+
+uint64_t select_support::select0_help(uint64_t i, uint64_t n, uint64_t m)
+{
+    mid = (n+m)/2
+    midRank = r_supp_.rank0(mid)
+    
+    if (midRank == i)
+    {
+        return mid;
+    }
+    else if ((m-n) < 1)
+    {
+        cout << "ERROR: desired index not found"
+        return 0;
+    }
+    else if (midRank < i)
+    {
+        return select0_help(i, n, mid);
+    }
+    else
+    {
+        return select0_help(i, mid, m);
+    }
+}
+
+uint64_t select_support::select0(uint64_t i)
+{
+    return select0_help(i, 0, r_supp_.size());
+}
+
+uint64_t select_support::overhead()
+{
+    // TODO: write
+}
+
+void select_support::save(string& fname)
+{
+    // TODO: write
+}
+
+void select_support::load(string& fname)
+{
+    // TODO: write
+}
+
+// bool bit_vector::operator==(const bit_vector& rhs) const
 // {
-//     // If this is empty, use the assignment operator to copy rhs into this
-//     if(this->size_ == 0) {
-//         *this = rhs;
-//         return *this;
-//     }
-
-//     // create a copy of rhs
-//     ChunkyString newRhs{rhs};
-
-//     // save an iterator to one before the current end of chunks
-//     chunklist_iter_t seam = --chunks_.end();
-
-//     // append the two lists
-//     chunks_.splice(chunks_.end(), newRhs.chunks_);
-
-//     // check if the two chunks at the seam of the two lists can merge
-//     // and if so, merge them
-//     tryMergeRight(seam);
-
-//     // update size
-//     size_ += rhs.size_;
-
-//     return *this;
+//   
 // }
 
-// bool ChunkyString::operator==(const ChunkyString& rhs) const
-// {
-//     if(size_ != rhs.size_) {
-//         return false;
-//     }
-
-//     for(auto it = begin(), rhsIt = rhs.begin(); it != end(); ++it, ++rhsIt) {
-//         if(*it != *rhsIt) {
-//             return false;
-//         }
-//     }
-//     return true;
-// }
-
-// bool ChunkyString::operator!=(const ChunkyString& rhs) const
+// bool bit_vector::operator!=(const bit_vector& rhs) const
 // {
 //     return !(*this == rhs);
 // }
 
-// std::ostream& ChunkyString::print(std::ostream& out) const
+// std::ostream& bit_vector::print(std::ostream& out) const
 // {
 //     for(auto it = begin(); it != end(); ++it) {
 //         out << *it;
 //     }
-
 //     return out;
 // }

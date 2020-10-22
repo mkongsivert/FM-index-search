@@ -1,9 +1,9 @@
 /**
- * \file chunkystring.hpp
+ * \file bitvector.hpp
  *
- * \authors CS 70 given code, with additions by the fantastical falcon_kangaroo
+ * \authors Mackenzie Kong-Sivert
  *
- * \brief Declares the ChunkyString class.
+ * \brief Declares the bit_vector, rank_support, and select_support classes.
  */
 
 #ifndef BITSTRING_HPP_INCLUDED
@@ -38,12 +38,12 @@ public:
 
     uint64_t size();
     uint64_t num_bytes();
+    std::string dec_to_str(uint8_t n);
+    std::string print();
 
 private:
     uint64_t size_;
     uint64_t num_bytes_;
-    uint64_t s_;
-    uint64_t b_;
 
     uint8_t* bytes_;
 
@@ -51,48 +51,47 @@ private:
      * \class rank_support
      * \brief Class / structure that “wraps” the underlying bit-vector.
      */
-
-    // // these functions help us implement the relational operators (see below)
-    // template <typename Element, typename ChunklistIterator>
-    // friend bool operator==(
-    //         const ChunkyString::Iterator<Element, ChunklistIterator>& lhs,
-    //         const ChunkyString::Iterator<Element, ChunklistIterator>& rhs);
-    
-    // template <typename Element, typename ChunklistIterator>
-    // friend bool operator!=(
-    //         const ChunkyString::Iterator<Element, ChunklistIterator>& lhs,
-    //         const ChunkyString::Iterator<Element, ChunklistIterator>& rhs);
 };
 
 class rank_support {
 public:
         
-    /// Returns a singular value.
-    /// \note It is undefined behavior to use this for anything but
-    ///       assigning from another iterator.
     rank_support(bit_vector bits);
 
     /**
-    * \brief Split a chunk into two different chunks.
+    * \brief Find the number of 1s in a given bit_vector object from indices
+    *           0 to i (inclusive)
     *
-    * \param it   An iterator to the character that will become the first
-    *              character of the new chunk.
+    * \param i   The index for which we want to find the rank
     *
-    * \remarks
-    *      This will call tryMergeRight() on the newly-inserted chunk.
+    * \remarks rank1(i) + rank(0) = i
     */
     uint64_t rank1(uint64_t i);
+
+    /**
+    * \brief Find the number of 0s in a given bit_vector object from indices
+    *           0 to i (inclusive)
+    *
+    * \param i   The index for which we want to find the rank
+    *
+    * \remarks rank1(i) + rank(0) = i
+    */
     uint64_t rank0(uint64_t i);
     uint64_t overhead();
+    std::string print();
     void save(string& fname);
     void load(string& fname);
+
+    uint64_t size();
 
 private:
     /**
      * \brief
-     *      The size of the associated bit vector
+     *      The associated bit vector
      */
-    uint64_t size_;
+    bit_vector bits_;
+    uint64_t s_;
+    uint64_t b_;
 
     /**
     * \brief
@@ -123,9 +122,38 @@ private:
     */
     uint64_t rank_helper(uint64_t n, uint64_t i, uint64_t b);
 
-    uint64_t** rank_matrix(uint64_t b);
-
+    uint64_t get_bit_i(uint64_t i);
 };
+
+class select_support {
+public:
+    select_support(rank_support r_supp);
+
+    /**
+    * \brief Given i, find the ith 1 in a given bitstring
+    *
+    * \param i   The ordinal number of 1s we want to find
+    *
+    * \remarks This is essentially implemented using binary search.
+    */
+    uint64_t select1(uint64_t i);
+
+    /**
+    * \brief Given i, find the ith 0 in a given bitstring
+    *
+    * \param i   The ordinal number of 0s we want to find
+    *
+    * \remarks This is essentially implemented using binary search.
+    */
+    uint64_t select0(uint64_t i);
+    uint64_t overhead();
+    save(string& fname);
+    load(string& fname);
+private:
+    rank_support r_supp_;
+}
+
+
 
 /**
  * \brief Print operator.
