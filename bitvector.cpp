@@ -10,12 +10,13 @@
 
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <math.h>
 
 bit_vector::bit_vector() :
-        size_{0}, num_bytes_{0}, bits_{}
+        size_{0}, num_bytes_{0}
 {
-    //nothing to do here
+    bytes_ = NULL;
 }
 
 bit_vector::bit_vector(std::string seq)
@@ -73,9 +74,10 @@ std::string bit_vector::print()
     {
         bitstr += dec_to_str(bytes_[i]);
     }
+    return bitstr;
 }
 
-std::string rank_helper::dec_to_str(uint8_t n)
+std::string rank_support::dec_to_str(uint8_t n)
 {
     if (n <= 1)
     {
@@ -108,9 +110,9 @@ rank_support::rank_support(bit_vector bits) :
 
     uint64_t sCount = 0;
     uint64_t bCount = 0;
-    for (uint64_t i = 0; i < bits.num_bytes; ++i)
+    for (uint64_t i = 0; i < bits.num_bytes(); ++i)
     {
-        std::string this_byte = bits->bytes_[i];
+        std::string this_byte = dec_to_str(bits.bytes_[i]);
         for (uint64_t j = 0; j < 8; ++j)
         {
             uint64_t index = 8*i+j;
@@ -129,34 +131,34 @@ rank_support::rank_support(bit_vector bits) :
     }
 
     // Build matrix separately
-    Rp_ = new uint64_t*[pow(2,b)];
-    for (uint64_t i = 0; i < pow(2,b); ++i)
+    Rp_ = new uint64_t*[int(pow(2,b_))];
+    for (uint64_t i = 0; i < pow(2,b_); ++i)
     {
-        Rp_[i] = new uint64_t[b];
-        for (uint64_t j = 0; j < b; ++j)
+        Rp_[i] = new uint64_t[b_];
+        for (uint64_t j = 0; j < b_; ++j)
         {
-            Rp_[i][j] = rank_helper(i,j,b);
+            Rp_[i][j] = rank_helper(i,j,b_);
         }
     }
 }
 
 uint64_t rank_support::get_bit_i(uint64_t i)
 {
-    byte = bytes_[floor(float(i)/8.0)];
-    pos = i%8;
-    return floor(float(byte)/float(pow(2,7-pos))) % 2;
+    uint8_t byte = bits_.bytes_[int(float(i)/8.0)];
+    uint8_t pos = i%8;
+    return int(float(byte)/pow(2,7-pos)) % 2;
 }
 
 uint64_t rank_support::rank1(uint64_t i)
 {
-    i = 0 // bitstring type
-    for (k = i; k < i+b_; ++k)
+    uint8_t n = 0; // bitstring type
+    for (uint64_t k = i; k < i+b_; ++k)
     {
-        i = 2*i + get_bit_i(k)
+        n = 2*n + get_bit_i(k);
     }
-    j = i%b_ // index within bitstring
+    uint64_t j = i%b_; // index within bitstring
     // TODO: Maybe clean this up?
-    return Rs_[floor(float(i)/float(s_))] + Rb_[floor(float(i)/float(b_))] + Rp_[i][j];
+    return Rs_[int(float(i)/float(s_))] + Rb_[int(float(i)/float(b_))] + Rp_[i][j];
 }
 
 uint64_t rank_support::rank0(uint64_t i)
@@ -166,11 +168,11 @@ uint64_t rank_support::rank0(uint64_t i)
 
 std::string rank_support::print()
 {
-    std::string output = "Bitstring: " + bits_.print()
+    std::string output = "Bitstring: " + bits_.print();
     output += "\nSize: " + std::to_string(bits_.size()) + "\n\n";
-    output += "\nR_s: " + to_string(*Rs_) + "\nR_b: " + to_string(*R_b)
-    output += "s: " + to_string(s_) + "\nb: " + to_string(b_) + "\n\n";
-    output += "Overhead:" + to_string(overhead());
+    output += "\nR_s: " + std::to_string(*Rs_) + "\nR_b: " + std::to_string(*Rb_);
+    output += "s: " + std::to_string(s_) + "\nb: " + std::to_string(b_) + "\n\n";
+    output += "Overhead:" + std::to_string(overhead());
     return output;
 }
 
@@ -180,10 +182,9 @@ uint64_t rank_support::overhead()
     return sizeof(this)*8; // sizeof returns size in bytes
 }
 
-void rank_support::save(string& fname)
+void rank_support::save(std::string& fname)
 {
-    ofstream myfile;
-    myfile.open (fname);
+    std::ofstream myfile(fname, std::ofstream::out);
     myfile << print();
     myfile.close();
 }
@@ -206,8 +207,8 @@ select_support::select_support(rank_support r_supp) :
 
 uint64_t select_support::select1_help(uint64_t i, uint64_t n, uint64_t m)
 {
-    mid = (n+m)/2
-    midRank = r_supp_.rank1(mid)
+    uint64_t mid = (n+m)/2;
+    uint64_t midRank = r_supp_.rank1(mid);
     
     if (midRank == i)
     {
@@ -215,7 +216,7 @@ uint64_t select_support::select1_help(uint64_t i, uint64_t n, uint64_t m)
     }
     else if ((m-n) < 1)
     {
-        cout << "ERROR: desired index not found"
+        std::cout << "ERROR: desired index not found";
         return 0;
     }
     else if (midRank < i)
@@ -235,8 +236,8 @@ uint64_t select_support::select1(uint64_t i)
 
 uint64_t select_support::select0_help(uint64_t i, uint64_t n, uint64_t m)
 {
-    mid = (n+m)/2
-    midRank = r_supp_.rank0(mid)
+    uint64_t mid = (n+m)/2;
+    uint64_t midRank = r_supp_.rank0(mid);
     
     if (midRank == i)
     {
@@ -244,7 +245,7 @@ uint64_t select_support::select0_help(uint64_t i, uint64_t n, uint64_t m)
     }
     else if ((m-n) < 1)
     {
-        cout << "ERROR: desired index not found"
+        std::cout << "ERROR: desired index not found";
         return 0;
     }
     else if (midRank < i)
@@ -265,7 +266,7 @@ uint64_t select_support::select0(uint64_t i)
 uint64_t select_support::overhead()
 {
     // TODO:
-    return sizeof(this)*8
+    return sizeof(this)*8;
 }
 
 std::string select_support::print()
@@ -275,7 +276,7 @@ std::string select_support::print()
 
 void select_support::save(std::string& fname)
 {
-    ofstream myfile;
+    std::ofstream myfile;
     myfile.open (fname);
     myfile << print();
     myfile.close();
@@ -286,20 +287,7 @@ void select_support::load(std::string& fname)
     // TODO: write
 }
 
-// bool bit_vector::operator==(const bit_vector& rhs) const
-// {
-//   
-// }
-
-// bool bit_vector::operator!=(const bit_vector& rhs) const
-// {
-//     return !(*this == rhs);
-// }
-
-// std::ostream& bit_vector::print(std::ostream& out) const
-// {
-//     for(auto it = begin(); it != end(); ++it) {
-//         out << *it;
-//     }
-//     return out;
-// }
+int main()
+{
+  return 0;
+}

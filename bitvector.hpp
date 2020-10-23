@@ -26,8 +26,6 @@
  *   TODO
  */
 class bit_vector {
-    template <typename Element, typename BitvecIterator>
-    class Iterator;
 public:
     /**
      * \brief Default constructor
@@ -47,11 +45,11 @@ public:
     std::string dec_to_str(uint8_t n);
     std::string print();
 
+    uint8_t* bytes_;
+
 private:
     uint64_t size_;
     uint64_t num_bytes_;
-
-    uint8_t* bytes_;
 
     /**
      * \class rank_support
@@ -136,6 +134,9 @@ private:
 class select_support {
 public:
     select_support(rank_support r_supp);
+
+    uint64_t select1_help(uint64_t i, uint64_t n, uint64_t m);
+    uint64_t select0_help(uint64_t i, uint64_t n, uint64_t m);
 
     /**
     * \brief Given i, find the ith 1 in a given bitstring
