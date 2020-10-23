@@ -30,9 +30,15 @@ class bit_vector {
     class Iterator;
 public:
     /**
+     * \brief Default constructor
+     *
+     * \note Will not be used; only exists for compilation
+     */
+    bit_vector();
+    /**
      * \brief Parameterized constructor
      *
-     * \note Runs in constant time.
+     * \note
      */
     bit_vector(std::string seq);
 
@@ -57,6 +63,7 @@ class rank_support {
 public:
         
     rank_support(bit_vector bits);
+    std::string dec_to_str(uint8_t n);
 
     /**
     * \brief Find the number of 1s in a given bit_vector object from indices
@@ -79,8 +86,8 @@ public:
     uint64_t rank0(uint64_t i);
     uint64_t overhead();
     std::string print();
-    void save(string& fname);
-    void load(string& fname);
+    void save(std::string& fname);
+    void load(std::string& fname);
 
     uint64_t size();
 
@@ -90,6 +97,7 @@ private:
      *      The associated bit vector
      */
     bit_vector bits_;
+    uint64_t size_;
     uint64_t s_;
     uint64_t b_;
 
@@ -148,11 +156,11 @@ public:
     uint64_t select0(uint64_t i);
     uint64_t overhead();
     std::string print();
-    void save(string& fname);
-    void load(string& fname);
+    void save(std::string& fname);
+    void load(std::string& fname);
 private:
     rank_support r_supp_;
-}
+};
 
 
 

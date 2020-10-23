@@ -12,29 +12,35 @@
 #include <sstream>
 #include <math.h>
 
+bit_vector::bit_vector() :
+        size_{0}, num_bytes_{0}, bits_{}
+{
+    //nothing to do here
+}
+
 bit_vector::bit_vector(std::string seq)
 {
     num_bytes_ = ceil(float(seq.length())/8.0);
-    bytes = new uint8_t[num_bytes_]
+    bytes_ = new uint8_t[num_bytes_];
     uint64_t counter = 0;
     uint8_t curr = 0;
     for (uint64_t i=0; i<=seq.length(); ++i)
     {
-        curr = curr*2 + std::stoi(str[i]);
+        curr = curr*2 + int(seq[i]);
         if (i%8==7)
         {
             bytes_[(i-7)/8] = curr;
             curr = 0;
         }
     }
-    size_ = str.length();
+    size_ = seq.length();
 
     // Add padding if necessary
     if (size_%8 != 0)
     {
         uint64_t pad = 8 - (counter%8);
         curr = curr* pow(2, pad);
-        bytes_.[-1] = curr;
+        bytes_[num_bytes_-1] = curr;
     } 
 }
 
@@ -62,19 +68,31 @@ std::string bit_vector::dec_to_str(uint8_t n)
 
 std::string bit_vector::print()
 {
-    std::string bitstr = '';
+    std::string bitstr;
     for (uint64_t i = 0; i < num_bytes_; ++i)
     {
         bitstr += dec_to_str(bytes_[i]);
     }
 }
 
-int64_t rank_support::rank_helper(uint64_t n, uint64_t i, uint64_t b)
+std::string rank_helper::dec_to_str(uint8_t n)
 {
-    uint64_t msb = (n >= pow(2,b-1) ? 1 : 0)
+    if (n <= 1)
+    {
+        return std::to_string(n);
+    }
+    else
+    {
+        return dec_to_str(n/2) + std::to_string(n%2);
+    }
+}
+
+uint64_t rank_support::rank_helper(uint64_t n, uint64_t i, uint64_t b)
+{
+    uint64_t msb = (n >= pow(2,b-1) ? 1 : 0);
     if (i == 0)
     {
-        return msb
+        return msb;
     }
     else
     {
@@ -83,26 +101,31 @@ int64_t rank_support::rank_helper(uint64_t n, uint64_t i, uint64_t b)
 }
 
 rank_support::rank_support(bit_vector bits) :
-        size_{bits.size()}
+        size_{bits.size()}, bits_{bits}
 {
     uint64_t s_ = ceil(pow(log2(size_), 2)/2);
     uint64_t b_ = ceil(log2(size_)/2);
 
-    loopCount = 0;
-    sCount = 0;
-    bCount = 0;
-    for (auto itr = bits.begin(); itr != bits.end(); ++itr)
+    uint64_t sCount = 0;
+    uint64_t bCount = 0;
+    for (uint64_t i = 0; i < bits.num_bytes; ++i)
     {
-        if (loopCount%b_ == 0)
+        std::string this_byte = bits->bytes_[i];
+        for (uint64_t j = 0; j < 8; ++j)
         {
-            Rb_.push_back(dCount);
+            uint64_t index = 8*i+j;
+            sCount += int(this_byte[j]);
+            bCount += int(this_byte[j]);
+            if (index%b_ == 0)
+            {
+                Rb_[index/b_] = bCount;
+            }
+            if (index%s_ == 0)
+            {
+                Rs_[index/s_] = sCount;
+                bCount = 0; // reset b entries for every s entry
+            }
         }
-        if (loopCount%s_ == 0)
-        {
-            Rs_.push_back(sCount);
-            dCount = 0; // reset b entries for every s entry
-        }
-        ++loopCount;
     }
 
     // Build matrix separately
@@ -165,7 +188,7 @@ void rank_support::save(string& fname)
     myfile.close();
 }
 
-void rank_support::load(string& fname)
+void rank_support::load(std::string& fname)
 {
     // TODO: write
 }
@@ -250,7 +273,7 @@ std::string select_support::print()
     return r_supp_.print();
 }
 
-void select_support::save(string& fname)
+void select_support::save(std::string& fname)
 {
     ofstream myfile;
     myfile.open (fname);
@@ -258,7 +281,7 @@ void select_support::save(string& fname)
     myfile.close();
 }
 
-void select_support::load(string& fname)
+void select_support::load(std::string& fname)
 {
     // TODO: write
 }
