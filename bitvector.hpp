@@ -14,6 +14,7 @@
 #include <list>
 #include <iterator>
 #include <iostream>
+#include <fstream>
 #include <type_traits>
 
 /**
@@ -60,8 +61,8 @@ private:
 class rank_support {
 public:
         
-    rank_support(bit_vector bits);
     std::string dec_to_str(uint8_t n);
+    rank_support(bit_vector bits);
 
     /**
     * \brief Find the number of 1s in a given bit_vector object from indices

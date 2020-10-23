@@ -103,7 +103,7 @@ uint64_t rank_support::rank_helper(uint64_t n, uint64_t i, uint64_t b)
 }
 
 rank_support::rank_support(bit_vector bits) :
-        size_{bits.size()}, bits_{bits}
+        bits_{bits}, size_{bits.size()}
 {
     uint64_t s_ = ceil(pow(log2(size_), 2)/2);
     uint64_t b_ = ceil(log2(size_)/2);
@@ -178,7 +178,6 @@ std::string rank_support::print()
 
 uint64_t rank_support::overhead()
 {
-    // TODO
     return sizeof(this)*8; // sizeof returns size in bytes
 }
 
@@ -265,7 +264,6 @@ uint64_t select_support::select0(uint64_t i)
 
 uint64_t select_support::overhead()
 {
-    // TODO:
     return sizeof(this)*8;
 }
 
