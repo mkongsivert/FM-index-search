@@ -67,14 +67,15 @@ std::string bit_vector::dec_to_str(uint8_t n)
     }
 }
 
-std::string bit_vector::print()
+void bit_vector::print()
 {
     std::string bitstr;
     for (uint64_t i = 0; i < num_bytes_; ++i)
     {
         bitstr += dec_to_str(bytes_[i]);
     }
-    return bitstr;
+    std::cout << "Bitstring: " << bitstr << std::endl;
+    std::cout << "Size: " << std::to_string(size) << std::endl;
 }
 
 std::string rank_support::dec_to_str(uint8_t n)
@@ -140,6 +141,7 @@ rank_support::rank_support(bit_vector bits) :
             Rp_[i][j] = rank_helper(i,j,b_);
         }
     }
+    std::cout << "size at initilization: " << std::to_string(s_) << std::endl;
 }
 
 uint64_t rank_support::get_bit_i(uint64_t i)
@@ -166,13 +168,23 @@ uint64_t rank_support::rank0(uint64_t i)
     return i - rank1(i);
 }
 
-std::string rank_support::print()
+void rank_support::print()
 {
-    std::string output = "Bitstring: " + bits_.print();
-    output += "\nSize: " + std::to_string(bits_.size()) + "\n\n";
-    output += "\nR_s: " + std::to_string(*Rs_) + "\nR_b: " + std::to_string(*Rb_);
-    output += "s: " + std::to_string(s_) + "\nb: " + std::to_string(b_) + "\n\n";
-    output += "Overhead:" + std::to_string(overhead());
+    bits_.print();
+
+    std::cout << "\n\nR_s: ";
+    for (uint64_t i = 0; i < Rs_->size(); ++i)
+    {
+        std::cout << (*Rs_)[i] << std::endl;
+    }
+
+    for (uint64_t j = 0; i < Rb_->size(); ++i)
+    {
+        std::cout << (*Rb_)[i] << std::endl;
+    }
+    std::cout << "\ns: " + std::to_string(s_) + "\nb: " + std::to_string(b_) + "\n\n" << std::endl;
+    std::cout << "Overhead:" + std::to_string(overhead()) << std::endl;
+    std::cout << output;
     return output;
 }
 
@@ -184,7 +196,7 @@ uint64_t rank_support::overhead()
 void rank_support::save(std::string& fname)
 {
     std::ofstream myfile(fname, std::ofstream::out);
-    myfile << print();
+    //myfile << print();
     myfile.close();
 }
 
@@ -267,16 +279,16 @@ uint64_t select_support::overhead()
     return sizeof(this)*8;
 }
 
-std::string select_support::print()
+void select_support::print()
 {
-    return r_supp_.print();
+    r_supp_.print();
 }
 
 void select_support::save(std::string& fname)
 {
     std::ofstream myfile;
     myfile.open (fname);
-    myfile << print();
+    //myfile << print();
     myfile.close();
 }
 
@@ -287,5 +299,11 @@ void select_support::load(std::string& fname)
 
 int main()
 {
-  return 0;
+    bit_vector testVec = bit_vector("111100111111110100000101");
+    testVec.print();
+    
+    rank_support testRank = rank_support(testVec);
+    testRank.print();
+    std::cout << "no segfault yet?" << std::endl;
+    return 0;
 }

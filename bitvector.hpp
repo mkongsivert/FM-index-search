@@ -44,7 +44,7 @@ public:
     uint64_t size();
     uint64_t num_bytes();
     std::string dec_to_str(uint8_t n);
-    std::string print();
+    void print();
 
     uint8_t* bytes_;
 
@@ -84,7 +84,7 @@ public:
     */
     uint64_t rank0(uint64_t i);
     uint64_t overhead();
-    std::string print();
+    void print();
     void save(std::string& fname);
     void load(std::string& fname);
 
@@ -157,7 +157,7 @@ public:
     */
     uint64_t select0(uint64_t i);
     uint64_t overhead();
-    std::string print();
+    void print();
     void save(std::string& fname);
     void load(std::string& fname);
 private:
