@@ -75,7 +75,7 @@ void bit_vector::print()
         bitstr += dec_to_str(bytes_[i]);
     }
     std::cout << "Bitstring: " << bitstr << std::endl;
-    std::cout << "Size: " << std::to_string(size) << std::endl;
+    std::cout << "Size: " << std::to_string(size_) << std::endl;
 }
 
 std::string rank_support::dec_to_str(uint8_t n)
@@ -106,11 +106,13 @@ uint64_t rank_support::rank_helper(uint64_t n, uint64_t i, uint64_t b)
 rank_support::rank_support(bit_vector bits) :
         bits_{bits}, size_{bits.size()}
 {
-    uint64_t s_ = ceil(pow(log2(size_), 2)/2);
-    uint64_t b_ = ceil(log2(size_)/2);
+    uint64_t s_ = pow(log2(size_), 2)/2;
+    uint64_t b_ = log2(size_)/2;
 
     uint64_t sCount = 0;
     uint64_t bCount = 0;
+    uint64_t sArray[int(ceil(float(size_)/float(s_)))];
+    uint64_t bArray[int(ceil(float(size_)/float(b_)))];
     for (uint64_t i = 0; i < bits.num_bytes(); ++i)
     {
         std::string this_byte = dec_to_str(bits.bytes_[i]);
@@ -121,15 +123,18 @@ rank_support::rank_support(bit_vector bits) :
             bCount += int(this_byte[j]);
             if (index%b_ == 0)
             {
-                Rb_[index/b_] = bCount;
+                bArray[index/b_] = bCount;
+                //before here
             }
             if (index%s_ == 0)
             {
-                Rs_[index/s_] = sCount;
+                sArray[index/s_] = sCount;
                 bCount = 0; // reset b entries for every s entry
             }
         }
     }
+    Rs_ = sArray;
+    Rb_ = bArray;
 
     // Build matrix separately
     Rp_ = new uint64_t*[int(pow(2,b_))];
@@ -141,7 +146,6 @@ rank_support::rank_support(bit_vector bits) :
             Rp_[i][j] = rank_helper(i,j,b_);
         }
     }
-    std::cout << "size at initilization: " << std::to_string(s_) << std::endl;
 }
 
 uint64_t rank_support::get_bit_i(uint64_t i)
@@ -173,19 +177,20 @@ void rank_support::print()
     bits_.print();
 
     std::cout << "\n\nR_s: ";
-    for (uint64_t i = 0; i < Rs_->size(); ++i)
-    {
-        std::cout << (*Rs_)[i] << std::endl;
-    }
 
-    for (uint64_t j = 0; i < Rb_->size(); ++i)
-    {
-        std::cout << (*Rb_)[i] << std::endl;
-    }
+    std::cout << typeid(*Rs_).name();
+    std::cout << typeid(*Rb_).name();
+    // for (uint64_t i = 0; i < Rs_->size(); ++i)
+    // {
+    //     std::cout << (*Rs_)[i] << std::endl;
+    // }
+
+    // for (uint64_t j = 0; j < Rb_->size(); ++j)
+    // {
+    //     std::cout << (*Rb_)[i] << std::endl;
+    // }
     std::cout << "\ns: " + std::to_string(s_) + "\nb: " + std::to_string(b_) + "\n\n" << std::endl;
     std::cout << "Overhead:" + std::to_string(overhead()) << std::endl;
-    std::cout << output;
-    return output;
 }
 
 uint64_t rank_support::overhead()
@@ -304,6 +309,5 @@ int main()
     
     rank_support testRank = rank_support(testVec);
     testRank.print();
-    std::cout << "no segfault yet?" << std::endl;
     return 0;
 }
