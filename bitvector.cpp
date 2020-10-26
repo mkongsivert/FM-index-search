@@ -106,8 +106,8 @@ uint64_t rank_support::rank_helper(uint64_t n, uint64_t i, uint64_t b)
 rank_support::rank_support(bit_vector bits) :
         bits_{bits}, size_{bits.size()}
 {
-    uint64_t s_ = pow(log2(size_), 2)/2;
-    uint64_t b_ = log2(size_)/2;
+    s_ = pow(log2(size_), 2)/2;
+    b_ = log2(size_)/2;
 
     uint64_t sCount = 0;
     uint64_t bCount = 0;
@@ -157,13 +157,13 @@ uint64_t rank_support::get_bit_i(uint64_t i)
 uint64_t rank_support::rank1(uint64_t i)
 {
     uint8_t n = 0; // bitstring type
-    for (uint64_t k = i; k < i+b_; ++k)
+    uint64_t j = i%b_; // index within bitstring
+    for (uint64_t k = i-j; k < i-j+b_; ++k)
     {
         n = 2*n + get_bit_i(k);
     }
-    uint64_t j = i%b_; // index within bitstring
     // TODO: Maybe clean this up?
-    return *(Rs_+(i/s_)) + *(Rb_+(i/b_)) + Rp_[i][j];
+    return *(Rs_+(i/s_)) + *(Rb_+(i/b_)) + Rp_[n][j];
 }
 
 uint64_t rank_support::rank0(uint64_t i)
@@ -175,20 +175,32 @@ void rank_support::print()
 {
     bits_.print();
 
-    std::cout << "\nR_s: ";
+    std::cout << "\nR_p:";
+    for (uint64_t a = 0; a < pow(2,b_); ++a)
+    {
+        for (uint64_t b = 0; b < b_; ++b)
+        {
+            std::cout << Rp_[a][b];
+            std::cout << (b < b_-1 ? ", " : "");
+        }
+        std::cout << std::endl;
+        std::cout << (a < pow(2,b_)-1 ? "    " : "");
+    }
 
-    for (uint64_t i = 0; i < (size_/b_); ++i)
+    std::cout << "R_s: ";
+
+    for (uint64_t i = 0; i <= (size_/s_); ++i)
     {
         std::cout << *(Rs_+i) << ", ";
     }
 
     std::cout << "\nR_b: ";
-    for (uint64_t j = 0; j < (size_/b_); ++j)
+    for (uint64_t j = 0; j <= (size_/b_); ++j)
     {
         std::cout << *(Rb_+j) << ", ";
     }
-    std::cout << "\ns: " << s_ << "\nb: " << b_ << "\n\n" << std::endl;
-    std::cout << "Overhead:" + std::to_string(overhead()) << std::endl;
+    std::cout << "\ns: " << s_ << "\nb: " << b_ << std::endl;
+    std::cout << "\nOverhead:" + std::to_string(overhead()) << std::endl;
 }
 
 uint64_t rank_support::overhead()
@@ -302,10 +314,11 @@ void select_support::load(std::string& fname)
 
 int main()
 {
-    bit_vector testVec = bit_vector("111100111111110100000101");
+    bit_vector testVec = bit_vector("11101011001101010001110011001101011001101101001111011111011001010010101000010010");
     testVec.print();
     
     rank_support testRank = rank_support(testVec);
     testRank.print();
+    std::cout << "Rank for i=30: " << testRank.rank1(30) << std::endl;
     return 0;
 }

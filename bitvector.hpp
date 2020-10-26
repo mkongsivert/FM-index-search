@@ -89,6 +89,8 @@ public:
     void load(std::string& fname);
 
     uint64_t size();
+    uint64_t s_;
+    uint64_t b_;
 
 private:
     /**
@@ -97,8 +99,6 @@ private:
      */
     bit_vector bits_;
     uint64_t size_;
-    uint64_t s_;
-    uint64_t b_;
 
     /**
     * \brief
