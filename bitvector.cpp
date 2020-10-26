@@ -122,20 +122,16 @@ rank_support::rank_support(bit_vector bits) :
             if (index%b_ == 0)
             {
                 bArray[index/b_] = bCount;
-                std::cout << "B: " << bCount << std::endl;
             }
             if (index%s_ == 0)
             {
                 sArray[index/s_] = sCount;
-                std::cout << "S: " << sCount << std::endl;
                 bCount = 0; // reset b entries for every s entry
             }
             sCount += this_byte[j]=='1' ? 1 : 0;
             bCount += this_byte[j]=='1' ? 1 : 0;
         }
     }
-    std::cout << *sArray << std::endl;
-    std::cout << *bArray << std::endl;
     Rs_ = sArray;
     Rb_ = bArray;
 
