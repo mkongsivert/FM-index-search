@@ -111,30 +111,31 @@ rank_support::rank_support(bit_vector bits) :
 
     uint64_t sCount = 0;
     uint64_t bCount = 0;
-    s_arr_len_ = int(ceil(float(size_)/float(s_)));
-    uint64_t sArray[s_arr_len_];
-    b_arr_len_ = int(ceil(float(size_)/float(b_)))
-    uint64_t bArray[s_arr_len_];
+    uint64_t *sArray = new uint64_t[size_/s_];
+    uint64_t *bArray = new uint64_t[size_/b_];
     for (uint64_t i = 0; i < bits.num_bytes(); ++i)
     {
         std::string this_byte = dec_to_str(bits.bytes_[i]);
         for (uint64_t j = 0; j < 8; ++j)
         {
             uint64_t index = 8*i+j;
-            sCount += int(this_byte[j]);
-            bCount += int(this_byte[j]);
             if (index%b_ == 0)
             {
                 bArray[index/b_] = bCount;
-                //before here
+                std::cout << "B: " << bCount << std::endl;
             }
             if (index%s_ == 0)
             {
                 sArray[index/s_] = sCount;
+                std::cout << "S: " << sCount << std::endl;
                 bCount = 0; // reset b entries for every s entry
             }
+            sCount += this_byte[j]=='1' ? 1 : 0;
+            bCount += this_byte[j]=='1' ? 1 : 0;
         }
     }
+    std::cout << *sArray << std::endl;
+    std::cout << *bArray << std::endl;
     Rs_ = sArray;
     Rb_ = bArray;
 
@@ -178,18 +179,19 @@ void rank_support::print()
 {
     bits_.print();
 
-    std::cout << "\n\nR_s: ";
+    std::cout << "\nR_s: ";
 
-    for (uint64_t i = 0; i < s_arr_len_; ++i)
+    for (uint64_t i = 0; i < (size_/b_); ++i)
     {
         std::cout << *(Rs_+i) << ", ";
     }
 
-    for (uint64_t j = 0; j < b_arr_len_; ++j)
+    std::cout << "\nR_b: ";
+    for (uint64_t j = 0; j < (size_/b_); ++j)
     {
-        std::cout << *(Rb_+j) << std::endl;
+        std::cout << *(Rb_+j) << ", ";
     }
-    std::cout << "\ns: " + std::to_string(s_) + "\nb: " + std::to_string(b_) + "\n\n" << std::endl;
+    std::cout << "\ns: " << s_ << "\nb: " << b_ << "\n\n" << std::endl;
     std::cout << "Overhead:" + std::to_string(overhead()) << std::endl;
 }
 

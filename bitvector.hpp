@@ -98,9 +98,7 @@ private:
     bit_vector bits_;
     uint64_t size_;
     uint64_t s_;
-    uint64_t s_arr_len_;
     uint64_t b_;
-    uint64_t b_arr_len_;
 
     /**
     * \brief
