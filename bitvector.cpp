@@ -335,15 +335,33 @@ void FM_text::print()
     std::cout << text_ << std::endl;
 }
 
-uint64_t FM_text::BWT(std::string T)
+uint64_t FM_text::BWT()
 {
-    
+    std::vector<std::string> rotations;
+    std::string curr = "$"+text_;
+    rotations.push_back(curr);
+    for (uint64_t i = 0; i < size_; ++i)
+    {
+        //rotate string
+        curr.append(curr.front());
+        curr.erase(curr.begin());
+
+        //place string in appropriate position
+        for (itr = rotations.begin(); itr != rotations.end(); ++itr)
+        {
+            if ()
+            {
+                --itr;
+                rotations.insert(itr, curr);
+                break;
+            }
+        }
+    }
 }
 
 void FM_text::FM_index()
 {
-    const sauchar_t* text = text_;
-    uint64_t bwt = divbwt(text, text, NULL, size_);
+    uint64_t bwt = BWT();
 }
 
 int main()
