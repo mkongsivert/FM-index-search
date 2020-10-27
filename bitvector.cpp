@@ -9,6 +9,7 @@
 #include "bitvector.hpp"
 
 #include <string>
+#include <vector>
 #include <sstream>
 #include <fstream>
 #include <math.h>
@@ -347,7 +348,9 @@ bool FM_text::prefix_less_than(std::string str0, std::string str1)
     }
     else if (str0.front()==str1.front())
     {
-        return prefix_less_than(str0.erase(str0.begin()), str1.erase(str1.begin()));
+        str0.erase(str0.begin());
+        str1.erase(str1.end());
+        return prefix_less_than(str0, str1);
     }
     else
     {
@@ -355,19 +358,39 @@ bool FM_text::prefix_less_than(std::string str0, std::string str1)
     }
 }
 
+std::vector<uint64_t> FM_text::label_indices(std::string T)
+{
+    std::vector<uint64_t> output;
+    //assuming case-insensitive alphanumeric characters (can alter later)
+    uint64_t alpha[36] = {0};
+    for (auto itr = T.begin(); itr != T.end(); ++itr)
+    {
+        uint64_t ind = ((int)*itr <= 57 ? (int)*itr - 48 : (int)*itr - 87);
+        output.push_back(alpha[ind]);
+        ++alpha[ind];
+    }
+    return output;
+}
+
 uint64_t FM_text::BWT()
 {
     std::vector<std::string> rotations;
+    std::vector<std::vector<uint64_t>> num_rotations;
     std::string curr = "$"+text_;
+    std::vector<uint64_t>curr_inds = label_indices(curr);
     rotations.push_back(curr);
     for (uint64_t i = 0; i < size_; ++i)
     {
         //rotate string
-        curr.append(curr.front());
+        curr.push_back(curr.front());
+        curr.erase(curr.begin());
+        //rotate incices
+        num_curr.push_back(num_curr.front());
         curr.erase(curr.begin());
 
-        //place string in appropriate position
-        for (itr = rotations.begin(); itr != rotations.end(); ++itr)
+        //place string and indices in appropriate position
+        auto num_itr = num_rotations.begin()
+        for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
         {
             if (prefix_less_than(curr, *itr))
             {
@@ -375,6 +398,7 @@ uint64_t FM_text::BWT()
                 rotations.insert(itr, curr);
                 break;
             }
+            ++num_itr
         }
     }
 }

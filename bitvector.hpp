@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <string>
+#include <vector>
 #include <list>
 #include <iterator>
 #include <iostream>
@@ -182,6 +183,7 @@ public:
     uint64_t size();
     void print();
     bool prefix_less_than(std::string str0, std::string str1);
+    std::vector<uint64_t> label_indices(std::string T);
     uint64_t BWT();
     
     void FM_index();
