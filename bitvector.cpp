@@ -12,6 +12,7 @@
 #include <sstream>
 #include <fstream>
 #include <math.h>
+#include <divsufsort.h>
 
 bit_vector::bit_vector() :
         size_{0}, num_bytes_{0}
@@ -310,6 +311,39 @@ void select_support::save(std::string& fname)
 void select_support::load(std::string& fname)
 {
     // TODO: write
+}
+
+FM_text::FM_text() :
+    text_{""}, size_{0}
+{
+    // nothing to do here
+}
+
+FM_text::FM_text(std::string text) :
+    text_{text}, size_{text.size()}
+{
+    // nothing to do here
+}
+
+uint64_t FM_text::size()
+{
+    return size_;
+}
+
+void FM_text::print()
+{
+    std::cout << text_ << std::endl;
+}
+
+uint64_t FM_text::BWT(std::string T)
+{
+    
+}
+
+void FM_text::FM_index()
+{
+    const sauchar_t* text = text_;
+    uint64_t bwt = divbwt(text, text, NULL, size_);
 }
 
 int main()

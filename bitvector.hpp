@@ -164,7 +164,35 @@ private:
     rank_support r_supp_;
 };
 
+class FM_text {
+public:
+    /**
+     * \brief Default constructor
+     *
+     * \note Will not be used; only exists for compilation
+     */
+    FM_text();
+    /**
+     * \brief Parameterized constructor
+     *
+     * \note
+     */
+    FM_text(std::string text);
 
+    uint64_t size();
+    void print();
+    uint64_t BWT(std::string T);
+    void FM_index();
+
+private:
+    uint64_t size_;
+    std::string text_;
+
+    /**
+     * \class rank_support
+     * \brief Class / structure that “wraps” the underlying bit-vector.
+     */
+};
 
 /**
  * \brief Print operator.
