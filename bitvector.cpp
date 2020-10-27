@@ -335,6 +335,26 @@ void FM_text::print()
     std::cout << text_ << std::endl;
 }
 
+bool FM_text::prefix_less_than(std::string str0, std::string str1)
+{
+    if (str0 == "")
+    {
+        return true;
+    }
+    else if (str1 == "")
+    {
+        return false;
+    }
+    else if (str0.front()==str1.front())
+    {
+        return prefix_less_than(str0.erase(str0.begin()), str1.erase(str1.begin()));
+    }
+    else
+    {
+        return (str0.front()<str1.front());
+    }
+}
+
 uint64_t FM_text::BWT()
 {
     std::vector<std::string> rotations;
@@ -349,7 +369,7 @@ uint64_t FM_text::BWT()
         //place string in appropriate position
         for (itr = rotations.begin(); itr != rotations.end(); ++itr)
         {
-            if ()
+            if (prefix_less_than(curr, *itr))
             {
                 --itr;
                 rotations.insert(itr, curr);

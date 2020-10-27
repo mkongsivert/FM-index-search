@@ -181,7 +181,9 @@ public:
 
     uint64_t size();
     void print();
-    uint64_t BWT(std::string T);
+    bool prefix_less_than(std::string str0, std::string str1);
+    uint64_t BWT();
+    
     void FM_index();
 
 private:
