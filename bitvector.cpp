@@ -344,6 +344,15 @@ void FM_text::print()
     std::cout << text_ << std::endl;
 }
 
+void FM_text::print_lstring(std::vector<ichar> text)
+{
+    for (auto itr = text.begin(); itr != text.end(); ++itr)
+    {
+        std::cout << itr->c_ << itr->i_;
+    }
+    std::cout << std::endl;
+}
+
 bool FM_text::prefix_less_than(std::vector<ichar> str0, std::vector<ichar> str1)
 {
     if (str0.empty())
@@ -357,7 +366,7 @@ bool FM_text::prefix_less_than(std::vector<ichar> str0, std::vector<ichar> str1)
     else if (str0.front().c_==str1.front().c_)
     {
         str0.erase(str0.begin());
-        str1.erase(str1.end());
+        str1.erase(str1.begin());
         return prefix_less_than(str0, str1);
     }
     else
@@ -390,21 +399,25 @@ std::vector<ichar> FM_text::label_indices(std::string T)
 std::vector<ichar> FM_text::BWT()
 {
     std::vector<std::vector<ichar>> rotations;
-    std::vector<ichar> curr = label_indices("$"+text_);
+    std::vector<ichar> curr = label_indices(text_+"$");
     rotations.push_back(curr);
     for (uint64_t i = 0; i < size_; ++i)
     {
         //rotate string
+        std::cout << "i: " << i << std::endl;
         curr.push_back(curr.front());
         curr.erase(curr.begin());
-
         //place string and indices in appropriate position
         for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
         {
             if (prefix_less_than(curr, *itr))
-            {
-                --itr;
+            {   
                 rotations.insert(itr, curr);
+                break;
+            }
+            else if (++itr == rotations.end())
+            {
+                rotations.push_back(curr);
                 break;
             }
         }
@@ -414,13 +427,12 @@ std::vector<ichar> FM_text::BWT()
     for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
     {
         output.push_back(*itr->begin());
-        std::cout << (*itr->begin()).c_ << std::endl;
     }
     for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
     {
         output.push_back(*(--(itr->end())));
-        std::cout << "no segfault yet 6" << std::endl;
     }
+    return output;
 }
 
 void FM_text::FM_index()
@@ -444,6 +456,7 @@ int main()
     FM_text testFM = FM_text("abaaba");
     testFM.print();
     std::vector<ichar> bwt = testFM.BWT();
+    std::cout << bwt.size() << std::endl;
     for (auto itr = bwt.begin(); itr != bwt.end(); ++itr)
     {
         std::cout << itr->c_;
