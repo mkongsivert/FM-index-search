@@ -13,6 +13,7 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <typeinfo>
 #include <math.h>
 #include <divsufsort.h>
 
@@ -411,8 +412,11 @@ std::string FM_text::BWT()
     for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
     {
         out1.push_back(*itr->begin());
+        std::cout << *itr->begin() << std::endl;
         out2.push_back(*(--(itr->end())));
-        out1.push_back(*num_itr->begin());
+        std::cout << typeid(*(num_itr->begin())).name() << std::endl;
+        out1.push_back(*(num_itr->begin()));
+        std::cout << "no segfault yet 6" << std::endl;
         out2.push_back(*(--(num_itr->end())));
         ++num_itr;
     }
@@ -430,11 +434,15 @@ void FM_text::FM_index()
 
 int main()
 {
-    bit_vector testVec = bit_vector("11101011001101010001110011001101011001101101001111011111011001010010101000010010");
-    testVec.print();
+    // bit_vector testVec = bit_vector("11101011001101010001110011001101011001101101001111011111011001010010101000010010");
+    // testVec.print();
     
-    rank_support testRank = rank_support(testVec);
-    testRank.print();
-    std::cout << "Rank for i=30: " << testRank.rank1(30) << std::endl;
+    // rank_support testRank = rank_support(testVec);
+    // testRank.print();
+    // std::cout << "Rank for i=30: " << testRank.rank1(30) << std::endl;
+
+    FM_text testFM = FM_text("abaaba");
+    testFM.print();
+    std::cout << testFM.BWT() << std::endl;
     return 0;
 }
