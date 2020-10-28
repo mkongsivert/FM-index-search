@@ -404,22 +404,25 @@ std::vector<ichar> FM_text::BWT()
     for (uint64_t i = 0; i < size_; ++i)
     {
         //rotate string
-        std::cout << "i: " << i << std::endl;
         curr.push_back(curr.front());
         curr.erase(curr.begin());
+        print_lstring(curr);
         //place string and indices in appropriate position
         for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
         {
             if (prefix_less_than(curr, *itr))
             {   
                 rotations.insert(itr, curr);
+                std::cout << "option1" << std::endl;
                 break;
             }
             else if (++itr == rotations.end())
             {
                 rotations.push_back(curr);
+                std::cout << "option2" << std::endl;
                 break;
             }
+            --itr;
         }
     }
     // extract F and L
@@ -439,9 +442,13 @@ void FM_text::FM_index()
 {
     // retrieve F and L
     std::vector<ichar> bwt = BWT();
-    // uint64_t l = bwt.size();
-    // std::string F = bwt.substr(0, l/2);
-    // std::string L = bwt.substr(l/2, l/2);
+    uint64_t half = bwt.size()/2;
+    std::vector<ichar> F(bwt.begin(), bwt.begin() + half);
+    std::vector<ichar> L(bwt.begin() + half, bwt.end());
+    std::cout << "F: ";
+    print_lstring(F);
+    std::cout << "L: ";
+    print_lstring(L);
 }
 
 int main()
@@ -455,12 +462,6 @@ int main()
 
     FM_text testFM = FM_text("abaaba");
     testFM.print();
-    std::vector<ichar> bwt = testFM.BWT();
-    std::cout << bwt.size() << std::endl;
-    for (auto itr = bwt.begin(); itr != bwt.end(); ++itr)
-    {
-        std::cout << itr->c_;
-    }
-    std::cout << std::endl;
+    testFM.FM_index();
     return 0;
 }
