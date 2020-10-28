@@ -3,7 +3,8 @@
  *
  * \authors Mackenzie Kong-Sivert
  *
- * \brief Implements the bit_vector, rank_support, and select_support classes.
+ * \brief Implements the bit_vector, rank_support, select_support, and 
+ * FM_text classes.
  */
 
 #include "bitvector.hpp"
@@ -315,13 +316,13 @@ void select_support::load(std::string& fname)
 }
 
 FM_text::FM_text() :
-    text_{""}, size_{0}
+    size_{0}, text_{""}
 {
     // nothing to do here
 }
 
 FM_text::FM_text(std::string text) :
-    text_{text}, size_{text.size()}
+    size_{text.size()}, text_{text}
 {
     // nothing to do here
 }
@@ -372,12 +373,12 @@ std::vector<uint64_t> FM_text::label_indices(std::string T)
     return output;
 }
 
-uint64_t FM_text::BWT()
+std::string FM_text::BWT()
 {
     std::vector<std::string> rotations;
     std::vector<std::vector<uint64_t>> num_rotations;
     std::string curr = "$"+text_;
-    std::vector<uint64_t>curr_inds = label_indices(curr);
+    std::vector<uint64_t>num_curr = label_indices(curr);
     rotations.push_back(curr);
     for (uint64_t i = 0; i < size_; ++i)
     {
@@ -389,23 +390,42 @@ uint64_t FM_text::BWT()
         curr.erase(curr.begin());
 
         //place string and indices in appropriate position
-        auto num_itr = num_rotations.begin()
+        auto num_itr = num_rotations.begin();
         for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
         {
             if (prefix_less_than(curr, *itr))
             {
                 --itr;
+                --num_itr;
                 rotations.insert(itr, curr);
+                num_rotations.insert(num_itr, num_curr);
                 break;
             }
-            ++num_itr
+            ++num_itr;
         }
     }
+    // extract F and L
+    std::string out1 = "";
+    std::string out2 = "";
+    auto num_itr = num_rotations.begin();
+    for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
+    {
+        out1.push_back(*itr->begin());
+        out2.push_back(*(--(itr->end())));
+        out1.push_back(*num_itr->begin());
+        out2.push_back(*(--(num_itr->end())));
+        ++num_itr;
+    }
+    return out1+out2;
 }
 
 void FM_text::FM_index()
 {
-    uint64_t bwt = BWT();
+    // retrieve F and L
+    std::string bwt = BWT();
+    uint64_t l = bwt.size();
+    std::string F = bwt.substr(0, l/2);
+    std::string L = bwt.substr(l/2, l/2);
 }
 
 int main()

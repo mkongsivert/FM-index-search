@@ -3,7 +3,8 @@
  *
  * \authors Mackenzie Kong-Sivert
  *
- * \brief Declares the bit_vector, rank_support, and select_support classes.
+ * \brief Declares the bit_vector, rank_support, select_support, and
+ * FM_text classes.
  */
 
 #ifndef BITSTRING_HPP_INCLUDED
@@ -184,7 +185,7 @@ public:
     void print();
     bool prefix_less_than(std::string str0, std::string str1);
     std::vector<uint64_t> label_indices(std::string T);
-    uint64_t BWT();
+    std::string BWT();
     
     void FM_index();
 
