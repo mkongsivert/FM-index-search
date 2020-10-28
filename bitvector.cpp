@@ -316,6 +316,12 @@ void select_support::load(std::string& fname)
     // TODO: write
 }
 
+ichar::ichar(char c, uint64_t i) :
+    c_{c}, i_{i}
+{
+    // nothing to do here
+}
+
 FM_text::FM_text() :
     size_{0}, text_{""}
 {
@@ -338,17 +344,17 @@ void FM_text::print()
     std::cout << text_ << std::endl;
 }
 
-bool FM_text::prefix_less_than(std::string str0, std::string str1)
+bool FM_text::prefix_less_than(std::vector<ichar> str0, std::vector<ichar> str1)
 {
-    if (str0 == "")
+    if (str0.empty())
     {
         return true;
     }
-    else if (str1 == "")
+    else if (str1.empty())
     {
         return false;
     }
-    else if (str0.front()==str1.front())
+    else if (str0.front().c_==str1.front().c_)
     {
         str0.erase(str0.begin());
         str1.erase(str1.end());
@@ -356,80 +362,74 @@ bool FM_text::prefix_less_than(std::string str0, std::string str1)
     }
     else
     {
-        return (str0.front()<str1.front());
+        return (str0.front().c_<str1.front().c_);
     }
 }
 
-std::vector<uint64_t> FM_text::label_indices(std::string T)
+std::vector<ichar> FM_text::label_indices(std::string T)
 {
-    std::vector<uint64_t> output;
+    std::vector<ichar> output;
     //assuming case-insensitive alphanumeric characters (can alter later)
-    uint64_t alpha[36] = {0};
+    uint64_t alpha[37] = {0};
     for (auto itr = T.begin(); itr != T.end(); ++itr)
     {
-        uint64_t ind = ((int)*itr <= 57 ? (int)*itr - 48 : (int)*itr - 87);
-        output.push_back(alpha[ind]);
-        ++alpha[ind];
+        if (*itr == '$')
+        {
+            output.push_back(ichar('$',0));
+        }
+        else
+        {
+            uint64_t ind = ((int)*itr <= 57 ? (int)*itr - 48 : (int)*itr - 87);
+            output.push_back(ichar(*itr, alpha[ind]));
+            ++alpha[ind];
+        }
     }
     return output;
 }
 
-std::string FM_text::BWT()
+std::vector<ichar> FM_text::BWT()
 {
-    std::vector<std::string> rotations;
-    std::vector<std::vector<uint64_t>> num_rotations;
-    std::string curr = "$"+text_;
-    std::vector<uint64_t>num_curr = label_indices(curr);
+    std::vector<std::vector<ichar>> rotations;
+    std::vector<ichar> curr = label_indices("$"+text_);
     rotations.push_back(curr);
     for (uint64_t i = 0; i < size_; ++i)
     {
         //rotate string
         curr.push_back(curr.front());
         curr.erase(curr.begin());
-        //rotate incices
-        num_curr.push_back(num_curr.front());
-        curr.erase(curr.begin());
 
         //place string and indices in appropriate position
-        auto num_itr = num_rotations.begin();
         for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
         {
             if (prefix_less_than(curr, *itr))
             {
                 --itr;
-                --num_itr;
                 rotations.insert(itr, curr);
-                num_rotations.insert(num_itr, num_curr);
                 break;
             }
-            ++num_itr;
         }
     }
     // extract F and L
-    std::string out1 = "";
-    std::string out2 = "";
-    auto num_itr = num_rotations.begin();
+    std::vector<ichar> output;
     for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
     {
-        out1.push_back(*itr->begin());
-        std::cout << *itr->begin() << std::endl;
-        out2.push_back(*(--(itr->end())));
-        std::cout << typeid(*(num_itr->begin())).name() << std::endl;
-        out1.push_back(*(num_itr->begin()));
-        std::cout << "no segfault yet 6" << std::endl;
-        out2.push_back(*(--(num_itr->end())));
-        ++num_itr;
+        output.push_back(*itr->begin());
+        std::cout << (*itr->begin()).c_ << std::endl;
     }
-    return out1+out2;
+    for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
+    {
+        output.push_back(*(--(itr->end())));
+        std::cout << "no segfault yet 6" << std::endl;
+    }
 }
 
 void FM_text::FM_index()
 {
     // retrieve F and L
-    std::string bwt = BWT();
-    uint64_t l = bwt.size();
-    std::string F = bwt.substr(0, l/2);
-    std::string L = bwt.substr(l/2, l/2);
+    std::vector<ichar> bwt = BWT();
+    // uint64_t l = bwt.size();
+    // std::string F = bwt.substr(0, l/2);
+    // std::string L = bwt.substr(l/2, l/2);
 }
 
 int main()
@@ -443,6 +443,11 @@ int main()
 
     FM_text testFM = FM_text("abaaba");
     testFM.print();
-    std::cout << testFM.BWT() << std::endl;
+    std::vector<ichar> bwt = testFM.BWT();
+    for (auto itr = bwt.begin(); itr != bwt.end(); ++itr)
+    {
+        std::cout << itr->c_;
+    }
+    std::cout << std::endl;
     return 0;
 }

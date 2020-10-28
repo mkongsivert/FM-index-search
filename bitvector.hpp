@@ -166,6 +166,21 @@ private:
     rank_support r_supp_;
 };
 
+class ichar {
+public:
+    char c_;
+    uint64_t i_;
+    /**
+     * \brief Parameterized constructor
+     *
+     * \note
+     */
+    ichar(char c, uint64_t i);
+
+private:
+
+};
+
 class FM_text {
 public:
     /**
@@ -183,9 +198,9 @@ public:
 
     uint64_t size();
     void print();
-    bool prefix_less_than(std::string str0, std::string str1);
-    std::vector<uint64_t> label_indices(std::string T);
-    std::string BWT();
+    bool prefix_less_than(std::vector<ichar> str0, std::vector<ichar> str1);
+    std::vector<ichar> label_indices(std::string T);
+    std::vector<ichar> BWT();
     
     void FM_index();
 
