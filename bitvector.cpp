@@ -420,7 +420,7 @@ uint64_t FM_text::ind(char c)
             return 3;
             break;
         default:
-            std::cout << "Error: tried to query $" << std::endl;
+            std::cout << "Error: tried to query " << c << std::endl;
             return 4;
             break;
     }
@@ -437,9 +437,12 @@ FM_text::FM_text(std::string text) :
 
     Occ_ = new uint64_t*[size_/10];
     uint64_t row[4] = {0};
-    for (uint64_t i = 0; i < size_; ++i)
+    for (uint64_t i = 0; i <= size_; ++i)
     {
-        row[ind(L_->c_)]+=1;
+        if ((L_+i)->c_ != '$')
+        {
+            row[ind((L_+i)->c_)]+=1;
+        }
         if (i%10 == 0)
         {
             Occ_[i/10] = row;
@@ -550,7 +553,7 @@ std::vector<ichar> FM_text::BWT(std::string text)
         Lstring.push_back((*itr)[size_]);
     }
     std::vector<ichar> out_temp = label_indices(Lstring);
-    output.insert(--output.end(), out_temp.begin(), out_temp.end());
+    output.insert(output.end(), out_temp.begin(), out_temp.end());
     return output;
 }
 
@@ -566,6 +569,8 @@ uint64_t* FM_text::query(std::string pre)
         //find first and last indices with this character
         uint64_t last = first + tally_[ind(pre[0])];
         static uint64_t out[2] = {first, last};
+        std::cout << "char: " << pre[0] << std::endl;
+        std::cout << "tally: " << tally_[ind(pre[0])] << std::endl;
         return out;
     }
     else
@@ -616,8 +621,9 @@ int main()
     // testRank.print();
     // std::cout << "Rank for i=30: " << testRank.rank1(30) << std::endl;
 
-    FM_text testFM = FM_text("abaaba");
+    FM_text testFM = FM_text("acaaca");
     testFM.print();
-    testFM.FM_index();
+    uint64_t* result = testFM.query("aca");
+    std::cout << *result << ", " << *(result+1) << std::endl;
     return 0;
 }
