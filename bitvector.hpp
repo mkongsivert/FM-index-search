@@ -205,7 +205,7 @@ public:
     bool prefix_less_than(std::string str0, std::string str1);
     std::vector<ichar> label_indices(std::string T);
     std::vector<ichar> BWT(std::string text);
-    uint64_t* query(std::string pre);
+    std::vector<uint64_t> query(std::string pre);
     
     void FM_index();
 

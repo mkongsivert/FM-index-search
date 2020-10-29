@@ -435,7 +435,7 @@ FM_text::FM_text(std::string text) :
     F_ = &bwt[0];
     L_ = &bwt[size_+1];
 
-    Occ_ = new uint64_t*[size_/10];
+    Occ_ = new uint64_t*[(size_/10)+1];
     uint64_t row[4] = {0};
     for (uint64_t i = 0; i <= size_; ++i)
     {
@@ -445,9 +445,14 @@ FM_text::FM_text(std::string text) :
         }
         if (i%10 == 0)
         {
-            Occ_[i/10] = row;
+            Occ_[i/10] = new uint64_t[4];
+            for (uint8_t j = 0; j < 4; ++j)
+            {
+                Occ_[i/10][j] = row[j];
+            }
         }
     }
+
     for (uint8_t j = 0; j < 4; ++j)
     {
         tally_[j] = row[j];
@@ -557,7 +562,7 @@ std::vector<ichar> FM_text::BWT(std::string text)
     return output;
 }
 
-uint64_t* FM_text::query(std::string pre)
+std::vector<uint64_t> FM_text::query(std::string pre)
 {
     if (pre.size() == 1)
     {
@@ -568,40 +573,43 @@ uint64_t* FM_text::query(std::string pre)
         }
         //find first and last indices with this character
         uint64_t last = first + tally_[ind(pre[0])];
-        static uint64_t out[2] = {first, last};
-        std::cout << "char: " << pre[0] << std::endl;
-        std::cout << "tally: " << tally_[ind(pre[0])] << std::endl;
+        std::vector<uint64_t> out;
+        out.push_back(first);
+        out.push_back(last);
         return out;
     }
     else
     {
-        uint64_t* interval = query(pre.substr(1));
+        std::vector<uint64_t> interval = query(pre.substr(1));
         // find transition from 1st to 2nd char
-        uint64_t first = interval[0]/10;
-        uint8_t check0 = interval[0] - interval[0]%10 + 1;
-        for (uint8_t i = check0; i <= interval[0]; ++i)
+        uint8_t chai = ind(pre[0]);
+        uint64_t first = Occ_[(interval.front()/10)][chai];
+        uint8_t check0 = interval.front() - interval.front()%10 + 1;
+        for (uint8_t i = check0; i <= interval.front(); ++i)
         {
             first += (L_[i].c_==pre[0] ? 1 : 0);
         }
-        uint64_t last = interval[1]/10;
-        uint8_t check1 = interval[1] - interval[1]%10 + 1;
-        for (uint8_t i = check1; i <= interval[1]; ++i)
+        uint64_t last = Occ_[interval.back()/10][chai];
+        uint8_t check1 = interval.back() - interval.back()%10 + 1;
+        for (uint8_t i = check1; i <= interval.back(); ++i)
         {
             last += (L_[i].c_==pre[0] ? 1 : 0);
         }
 
         // find corresponding index in F_
-        uint64_t first1 = 1 + first;
-        for (uint8_t i = 0; i < ind(pre[0]); ++i)
+        for (uint8_t i = 0; i < chai; ++i)
         {
-            first1 += tally_[i];
+            first += tally_[i];
         }
-        uint64_t last1 = 1 + last;
-        for (uint8_t i = 0; i < ind(pre[0]); ++i)
+        last += 1;
+        for (uint8_t i = 0; i < chai; ++i)
         {
-            last1 += tally_[i];
+            last += tally_[i];
         }
-        static uint64_t out[2] = {first1, last1};
+        std::cout << pre << std::endl;
+        std::vector<uint64_t> out;
+        out.push_back(first);
+        out.push_back(last);
         return out;
     }
 }
@@ -623,7 +631,7 @@ int main()
 
     FM_text testFM = FM_text("acaaca");
     testFM.print();
-    uint64_t* result = testFM.query("aca");
-    std::cout << *result << ", " << *(result+1) << std::endl;
+    std::vector<uint64_t> result = testFM.query("aca");
+    std::cout << result.front() << ", " << result.back() << std::endl;
     return 0;
 }
