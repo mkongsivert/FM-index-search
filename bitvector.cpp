@@ -345,6 +345,8 @@ uint64_t FM_text::ind(char c)
             return 3;
             break;
         default:
+            std::cout << "Error: tried to query $" << std::endl;
+            return 4;
             break;
     }
 }
@@ -368,7 +370,10 @@ FM_text::FM_text(std::string text) :
             Occ_[i/10] = row;
         }
     }
-    tally_ = row;
+    for (uint8_t j = 0; j < 4; ++j)
+    {
+        tally_[j] = row[j];
+    }
 }
 
 uint64_t FM_text::size()
@@ -478,42 +483,46 @@ uint64_t* FM_text::query(std::string pre)
 {
     if (pre.size() == 1)
     {
-        switch (pre[0])
+        uint64_t first = 1;
+        for (uint8_t i = 0; i < ind(pre[0]); ++i)
         {
-            case 'a':
-                uint64_t first = 1;
-                break;
-            case 'c':
-                uint64_t first = 1 + tally_[0];
-                break;
-            case 'g':
-                uint64_t first = 1 + tally_[0] + tally_[1];
-                break;
-            case 't':
-                uint64_t first = 1 + tally_[0] + tally_[1] + tally_[2];
-                break;
-            default:
-                break;
+            first += tally_[i];
         }
         //find first and last indices with this character
         uint64_t last = first + tally_[ind(pre[0])];
-        uint64_t out[2] = {first, last};
+        static uint64_t out[2] = {first, last};
         return out;
     }
     else
     {
         uint64_t* interval = query(pre.substr(1));
         // find transition from 1st to 2nd char
-        uint64_t first = interval[0]/10
-        for (uint8_t i = interval[0]/10; i <= interval[0]%10; ++i)
+        uint64_t first = interval[0]/10;
+        uint8_t check0 = interval[0] - interval[0]%10 + 1;
+        for (uint8_t i = check0; i <= interval[0]; ++i)
         {
-            //
+            first += (L_[i].c_==pre[0] ? 1 : 0);
         }
-        uint64_t last = Occ_interval[1]/10
-        for (uint8_t i = 1; i <= interval[1]%10; ++i)
+        uint64_t last = interval[1]/10;
+        uint8_t check1 = interval[1] - interval[1]%10 + 1;
+        for (uint8_t i = check1; i <= interval[1]; ++i)
         {
-            // count up from nearest checkpoint
+            last += (L_[i].c_==pre[0] ? 1 : 0);
         }
+
+        // find corresponding index in F_
+        uint64_t first1 = 1 + first;
+        for (uint8_t i = 0; i < ind(pre[0]); ++i)
+        {
+            first1 += tally_[i];
+        }
+        uint64_t last1 = 1 + last;
+        for (uint8_t i = 0; i < ind(pre[0]); ++i)
+        {
+            last1 += tally_[i];
+        }
+        static uint64_t out[2] = {first1, last1};
+        return out;
     }
 }
 

@@ -213,6 +213,7 @@ private:
     ichar* L_;
     uint64_t tally_[4];
     uint64_t** Occ_;
+    uint64_t ind(char c);
     /**
      * \class rank_support
      * \brief Class / structure that “wraps” the underlying bit-vector.
