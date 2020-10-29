@@ -49,6 +49,32 @@ bit_vector::bit_vector(std::string seq)
     } 
 }
 
+void bit_vector::load(std::string& fname)
+{
+    std::string line;
+    std::string contents;
+    std::ifstream myfile (fname);
+    if (myfile.is_open())
+    {
+        while ( getline (myfile,line) )
+        {
+            contents += line;
+        }
+        myfile.close();
+        std::string line_copy = "";
+        for (uint64_t i = 0; i < contents.size(); ++i)
+        {
+            if (contents[i] == '0' || contents[i] == '1')
+            {
+                line_copy.push_back(contents[i]);
+            }
+        }
+        *this = bit_vector(line_copy);
+    }
+
+    else std::cout << "Unable to open file"; 
+}
+
 uint64_t bit_vector::size()
 {
     return size_;
@@ -105,6 +131,14 @@ uint64_t rank_support::rank_helper(uint64_t n, uint64_t i, uint64_t b)
     {
         return msb + rank_helper(n-(msb*pow(2,b-1)), i-1, b-1);
     }
+}
+
+rank_support::rank_support()
+{
+    size_ = 0;
+    bits_ = bit_vector();
+    s_ = 0;
+    b_ = 0;
 }
 
 rank_support::rank_support(bit_vector bits) :
@@ -221,7 +255,9 @@ void rank_support::save(std::string& fname)
 
 void rank_support::load(std::string& fname)
 {
-    // TODO: write
+    bit_vector bits;
+    bits.load(fname);
+    *this = rank_support(bits);
 }
 
 uint64_t rank_support::size()
@@ -313,7 +349,9 @@ void select_support::save(std::string& fname)
 
 void select_support::load(std::string& fname)
 {
-    // TODO: write
+    rank_support r_supp;
+    r_supp.load(fname);
+    *this = select_support(r_supp);
 }
 
 ichar::ichar(char c, uint64_t i) :

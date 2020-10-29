@@ -42,6 +42,7 @@ public:
      * \note
      */
     bit_vector(std::string seq);
+    void load(std::string& fname);
 
     uint64_t size();
     uint64_t num_bytes();
@@ -64,6 +65,7 @@ class rank_support {
 public:
         
     std::string dec_to_str(uint8_t n);
+    rank_support();
     rank_support(bit_vector bits);
 
     /**
