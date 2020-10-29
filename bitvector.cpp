@@ -49,6 +49,19 @@ bit_vector::bit_vector(std::string seq)
     } 
 }
 
+void bit_vector::save(std::string& fname)
+{
+    std::ofstream myfile(fname, std::ofstream::out);
+    std::string bitstr;
+    for (uint64_t i = 0; i < num_bytes_; ++i)
+    {
+        bitstr += dec_to_str(bytes_[i]);
+    }
+    myfile << "Bitstring: " << bitstr << std::endl;
+    myfile << "Size: " << std::to_string(size_) << std::endl;
+    myfile.close();
+}
+
 void bit_vector::load(std::string& fname)
 {
     std::string line;
@@ -249,7 +262,34 @@ uint64_t rank_support::overhead()
 void rank_support::save(std::string& fname)
 {
     std::ofstream myfile(fname, std::ofstream::out);
-    //myfile << print();
+    bits_.save(fname);
+
+    myfile << "\nR_p:";
+    for (uint64_t a = 0; a < pow(2,b_); ++a)
+    {
+        for (uint64_t b = 0; b < b_; ++b)
+        {
+            myfile << Rp_[a][b];
+            myfile << (b < b_-1 ? ", " : "");
+        }
+        myfile << std::endl;
+        myfile << (a < pow(2,b_)-1 ? "    " : "");
+    }
+
+    myfile << "R_s: ";
+
+    for (uint64_t i = 0; i <= (size_/s_); ++i)
+    {
+        myfile << *(Rs_+i) << ", ";
+    }
+
+    myfile << "\nR_b: ";
+    for (uint64_t j = 0; j <= (size_/b_); ++j)
+    {
+        myfile << *(Rb_+j) << ", ";
+    }
+    myfile << "\ns: " << s_ << "\nb: " << b_ << std::endl;
+    myfile << "\nOverhead:" + std::to_string(overhead()) << std::endl;
     myfile.close();
 }
 
@@ -341,10 +381,7 @@ void select_support::print()
 
 void select_support::save(std::string& fname)
 {
-    std::ofstream myfile;
-    myfile.open (fname);
-    //myfile << print();
-    myfile.close();
+    r_supp_.save(fname);
 }
 
 void select_support::load(std::string& fname)

@@ -42,6 +42,7 @@ public:
      * \note
      */
     bit_vector(std::string seq);
+    void save(std::string& fname);
     void load(std::string& fname);
 
     uint64_t size();
