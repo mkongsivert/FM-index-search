@@ -211,6 +211,7 @@ private:
     std::string text_;
     ichar* F_;
     ichar* L_;
+    uint64_t tally_[4];
     uint64_t** Occ_;
     /**
      * \class rank_support

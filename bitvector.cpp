@@ -328,6 +328,27 @@ FM_text::FM_text() :
     // nothing to do here
 }
 
+uint64_t FM_text::ind(char c)
+{
+    switch(c)
+    {
+        case 'a' :
+            return 0;
+            break;
+        case 'c' :
+            return 1;
+            break;
+        case 'g' :
+            return 2;
+            break;
+        case 't' :
+            return 3;
+            break;
+        default:
+            break;
+    }
+}
+
 FM_text::FM_text(std::string text) :
     size_{text.size()}, text_{text}
 {
@@ -335,34 +356,19 @@ FM_text::FM_text(std::string text) :
     // very tired.
     std::vector<ichar> bwt = BWT(text);
     F_ = &bwt[0];
-    L_ = &bwt[size_];
+    L_ = &bwt[size_+1];
 
     Occ_ = new uint64_t*[size_/10];
     uint64_t row[4] = {0};
     for (uint64_t i = 0; i < size_; ++i)
     {
-        switch(L_->c_)
-        {
-            case 'a' :
-                row[0]+=1;
-                break;
-            case 'c' :
-                row[1]+=1;
-                break;
-            case 'g' :
-                row[2]+=1;
-                break;
-            case 't' :
-                row[3]+=1;
-                break;
-            default:
-                break;
-        }
+        row[ind(L_->c_)]+=1;
         if (i%10 == 0)
         {
             Occ_[i/10] = row;
         }
     }
+    tally_ = row;
 }
 
 uint64_t FM_text::size()
@@ -472,9 +478,25 @@ uint64_t* FM_text::query(std::string pre)
 {
     if (pre.size() == 1)
     {
-        uint64_t first = 0; // first = 1(for $) + # chars that come alphabetically before
-        uint64_t last = 0; // last = first + # chars of this type
+        switch (pre[0])
+        {
+            case 'a':
+                uint64_t first = 1;
+                break;
+            case 'c':
+                uint64_t first = 1 + tally_[0];
+                break;
+            case 'g':
+                uint64_t first = 1 + tally_[0] + tally_[1];
+                break;
+            case 't':
+                uint64_t first = 1 + tally_[0] + tally_[1] + tally_[2];
+                break;
+            default:
+                break;
+        }
         //find first and last indices with this character
+        uint64_t last = first + tally_[ind(pre[0])];
         uint64_t out[2] = {first, last};
         return out;
     }
@@ -482,6 +504,16 @@ uint64_t* FM_text::query(std::string pre)
     {
         uint64_t* interval = query(pre.substr(1));
         // find transition from 1st to 2nd char
+        uint64_t first = interval[0]/10
+        for (uint8_t i = interval[0]/10; i <= interval[0]%10; ++i)
+        {
+            //
+        }
+        uint64_t last = Occ_interval[1]/10
+        for (uint8_t i = 1; i <= interval[1]%10; ++i)
+        {
+            // count up from nearest checkpoint
+        }
     }
 }
 
