@@ -384,25 +384,23 @@ void FM_text::print_lstring(std::vector<ichar> text)
     std::cout << std::endl;
 }
 
-bool FM_text::prefix_less_than(std::vector<ichar> str0, std::vector<ichar> str1)
+bool FM_text::prefix_less_than(std::string str0, std::string str1)
 {
-    if (str0.empty())
+    if (str0 == "")
     {
         return true;
     }
-    else if (str1.empty())
+    else if (str1 == "")
     {
         return false;
     }
-    else if (str0.front().c_==str1.front().c_)
+    else if (str0.front()==str1.front())
     {
-        str0.erase(str0.begin());
-        str1.erase(str1.begin());
-        return prefix_less_than(str0, str1);
+        return prefix_less_than(str0.substr(1), str1.substr(1));
     }
     else
     {
-        return (str0.front().c_<str1.front().c_);
+        return (str0.front()<str1.front());
     }
 }
 
@@ -429,8 +427,8 @@ std::vector<ichar> FM_text::label_indices(std::string T)
 
 std::vector<ichar> FM_text::BWT(std::string text)
 {
-    std::vector<std::vector<ichar>> rotations;
-    std::vector<ichar> curr = label_indices(text+"$");
+    std::vector<std::string> rotations;
+    std::string curr = text+"$";
     rotations.push_back(curr);
     for (uint64_t i = 0; i < size_; ++i)
     {
@@ -454,15 +452,19 @@ std::vector<ichar> FM_text::BWT(std::string text)
         }
     }
     // extract F and L
-    std::vector<ichar> output;
+    std::string Fstring;
     for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
     {
-        output.push_back(*itr->begin());
+        Fstring.push_back((*itr)[0]);
     }
+    std::vector<ichar> output = label_indices(Fstring);
+    std::string Lstring;
     for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
     {
-        output.push_back(*(--(itr->end())));
+        Lstring.push_back((*itr)[size_]);
     }
+    std::vector<ichar> out_temp = label_indices(Lstring);
+    output.insert(--output.end(), out_temp.begin(), out_temp.end());
     return output;
 }
 
@@ -475,6 +477,11 @@ uint64_t* FM_text::query(std::string pre)
         //find first and last indices with this character
         uint64_t out[2] = {first, last};
         return out;
+    }
+    else
+    {
+        uint64_t* interval = query(pre.substr(1));
+        // find transition from 1st to 2nd char
     }
 }
 

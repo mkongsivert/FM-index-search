@@ -199,7 +199,7 @@ public:
     uint64_t size();
     void print();
     void print_lstring(std::vector<ichar> text);
-    bool prefix_less_than(std::vector<ichar> str0, std::vector<ichar> str1);
+    bool prefix_less_than(std::string str0, std::string str1);
     std::vector<ichar> label_indices(std::string T);
     std::vector<ichar> BWT(std::string text);
     uint64_t* query(std::string pre);
