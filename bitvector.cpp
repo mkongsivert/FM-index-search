@@ -331,7 +331,38 @@ FM_text::FM_text() :
 FM_text::FM_text(std::string text) :
     size_{text.size()}, text_{text}
 {
-    // nothing to do here
+    // NOTE: this is specifically tailored to gene sequences because I am
+    // very tired.
+    std::vector<ichar> bwt = BWT(text);
+    F_ = &bwt[0];
+    L_ = &bwt[size_];
+
+    Occ_ = new uint64_t*[size_/10];
+    uint64_t row[4] = {0};
+    for (uint64_t i = 0; i < size_; ++i)
+    {
+        switch(L_->c_)
+        {
+            case 'a' :
+                row[0]+=1;
+                break;
+            case 'c' :
+                row[1]+=1;
+                break;
+            case 'g' :
+                row[2]+=1;
+                break;
+            case 't' :
+                row[3]+=1;
+                break;
+            default:
+                break;
+        }
+        if (i%10 == 0)
+        {
+            Occ_[i/10] = row;
+        }
+    }
 }
 
 uint64_t FM_text::size()
@@ -396,30 +427,27 @@ std::vector<ichar> FM_text::label_indices(std::string T)
     return output;
 }
 
-std::vector<ichar> FM_text::BWT()
+std::vector<ichar> FM_text::BWT(std::string text)
 {
     std::vector<std::vector<ichar>> rotations;
-    std::vector<ichar> curr = label_indices(text_+"$");
+    std::vector<ichar> curr = label_indices(text+"$");
     rotations.push_back(curr);
     for (uint64_t i = 0; i < size_; ++i)
     {
         //rotate string
         curr.push_back(curr.front());
         curr.erase(curr.begin());
-        print_lstring(curr);
         //place string and indices in appropriate position
         for (auto itr = rotations.begin(); itr != rotations.end(); ++itr)
         {
             if (prefix_less_than(curr, *itr))
             {   
                 rotations.insert(itr, curr);
-                std::cout << "option1" << std::endl;
                 break;
             }
             else if (++itr == rotations.end())
             {
                 rotations.push_back(curr);
-                std::cout << "option2" << std::endl;
                 break;
             }
             --itr;
@@ -438,17 +466,22 @@ std::vector<ichar> FM_text::BWT()
     return output;
 }
 
+uint64_t* FM_text::query(std::string pre)
+{
+    if (pre.size() == 1)
+    {
+        uint64_t first = 0; // first = 1(for $) + # chars that come alphabetically before
+        uint64_t last = 0; // last = first + # chars of this type
+        //find first and last indices with this character
+        uint64_t out[2] = {first, last};
+        return out;
+    }
+}
+
 void FM_text::FM_index()
 {
     // retrieve F and L
-    std::vector<ichar> bwt = BWT();
-    uint64_t half = bwt.size()/2;
-    std::vector<ichar> F(bwt.begin(), bwt.begin() + half);
-    std::vector<ichar> L(bwt.begin() + half, bwt.end());
-    std::cout << "F: ";
-    print_lstring(F);
-    std::cout << "L: ";
-    print_lstring(L);
+    
 }
 
 int main()

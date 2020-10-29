@@ -201,14 +201,17 @@ public:
     void print_lstring(std::vector<ichar> text);
     bool prefix_less_than(std::vector<ichar> str0, std::vector<ichar> str1);
     std::vector<ichar> label_indices(std::string T);
-    std::vector<ichar> BWT();
+    std::vector<ichar> BWT(std::string text);
+    uint64_t* query(std::string pre);
     
     void FM_index();
 
 private:
     uint64_t size_;
     std::string text_;
-
+    ichar* F_;
+    ichar* L_;
+    uint64_t** Occ_;
     /**
      * \class rank_support
      * \brief Class / structure that “wraps” the underlying bit-vector.
