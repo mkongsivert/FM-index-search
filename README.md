@@ -1,5 +1,5 @@
 # FM-index-search
-An implementation of FM-index substring search
+An implementation of FM-index substring search for genetic sequences
 ## Classes
 ### bit_vector
 This class forms the basis for the first two parts of this assignment. I tried to make the most efficient use of space by storing the bitstring as an array of unsigned integers. Each of these unsigned integers takes up a byte, so I broke the bitstring into eight-bit chunks, converted them individually into decimal integers, and made a dynamic array out of them. This required frequent conversion between decimal and binary, since the code itself operates using decimal numbers. Since it is mainly meant to be used for storage, I didn't add many more capabilities to the structure. The ones I did add were mainly for displaying information, such as `size()` and `print()`, which respectively return the size of the string in bits and print the bitstring to the command line.
